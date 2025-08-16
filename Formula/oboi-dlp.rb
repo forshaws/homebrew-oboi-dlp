@@ -25,31 +25,8 @@ class OboiDlp < Formula
   def install
     bin.install "oboi-dlp"
     
-    # Install default config
-    etc.install "oboi-dlp.conf"
-    
-    
-	# Install test files into pkgshare
-    pkgshare.install "oboi-dlp-test"
-    
   end
   
-  def caveats
-    <<~EOS
-	  A default config has been installed to:
-	    #{etc}/oboi-dlp.conf
-	  Edit this file to suit your needs.
-
-	  To test oboi-dlp with Apache, copy the test suite into your web root:
-	    sudo cp -r #{opt_pkgshare}/oboi-dlp-test /var/www/html/
-
-	  Then run the included test script:
-	    cd /var/www/html/oboi-dlp-test
-	    ./make_oboi_dlp_fixtures.sh
-
-	  Open http://127.0.0.1/oboi-dlp-test/test_oboi_dlp.html in your browser to verify.
-    EOS
-  end
 
   test do
     # Adjust to an actual test your binary supports
