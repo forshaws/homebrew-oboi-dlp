@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>OBOI-DLP Filter Playground V1.0</title>
+<style>
+  :root { --bg:#0b0f14; --fg:#d6dde6; --muted:#8aa1b1; --ok:#36d399; --bad:#ff6b6b; --card:#111722; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; background:linear-gradient(180deg,#0b0f14 0%, #0a1220 100%); color:var(--fg);
+    font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    padding: 20px; 
+  }
+  h1 { font-size: 22px; margin:0 0 12px; }
+  p { margin: 0 0 16px; color: var(--muted); }
+    a { color: white; }
+  .card {
+    background: var(--card); border:1px solid #1b2433; border-radius:16px; padding:16px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.35);
+  }
+  .row {
+    display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px dashed #1f2a3b;
+  }
+  .row:last-child { border-bottom:0; }
+  .name { flex:1; word-break: break-all; }
+  .status { font-weight:700; }
+  .ok { color: var(--ok); }
+  .bad { color: var(--bad); }
+  .run {
+    display:inline-block; background:#1c2a3b; border:1px solid #2a3b54; color:#fff; 
+    padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600;
+  }
+  .run:active { transform: translateY(1px); }
+  .note { margin-top:10px; color: var(--muted); font-size: 12px; }
+  .small { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <h1>OBOI-DLP Filter Playground V1.0</h1>
+  <p>Loads a set of files through Apache. If OBOI-DLP blocks them, you’ll see ❌ BLOCKED. Otherwise ✅ PASS.</p>
+  <div class="card">
+    <button class="run" id="runBtn">▶ Run Tests</button>
+    <div class="note">Tip: open <code>/tmp/dlpfilter.log</code> in a terminal: <code>tail -f /tmp/dlpfilter.log</code></div>
+    <div id="rows"></div>
+    <div class="small" id="summary"></div>
+  </div>
+
+<script>
+const tests = [
+  { file: 'safe.txt',                expect: 'pass',   label: 'Safe file (should PASS) ✅' },
+  { file: 'emails_3.txt',            expect: 'pass',   label: '<= 5 emails (should PASS) ✅' },
+  { file: 'emails_6.txt',            expect: 'block',  label: '> 5 emails (should BLOCK)' },
+  { file: 'creditcards.txt',         expect: 'block',  label: 'Valid CC numbers (should BLOCK ❌)' },
+  { file: 'aws_keys.txt',            expect: 'block',  label: 'AWS AKIA keys (should BLOCK if > threshold ❌)' },
+  { file: 'api_keys.txt',            expect: 'block',  label: 'API keys (should BLOCK if > threshold ❌)' },
+  { file: 'national_ids.txt',        expect: 'block',  label: 'National ID# (should BLOCK if > threshold ❌)' },
+  { file: 'bank_accounts.txt',       expect: 'block',  label: 'Account-like numbers (may BLOCK ❌)' },
+  { file: 'sort_codes.txt',          expect: 'mixed',  label: 'Sort codes + dates (dates PASS, sort codes BLOCK ❌)' },
+  { file: 'phone_numbers.txt',       expect: 'block',  label: 'UK phone numbers (may BLOCK ❌)' },
+];
+
+const rowsEl = document.getElementById('rows');
+const summaryEl = document.getElementById('summary');
+const runBtn = document.getElementById('runBtn');
+
+function rowTemplate(t) {
+  const el = document.createElement('div');
+  el.className = 'row';
+  el.innerHTML = `
+    <div class="name"><strong>${t.file}</strong><div class="small">${t.label}</div></div>
+    <div class="status" id="status-${t.file}">…</div>
+  `;
+  return el;
+}
+
+function setStatus(file, ok, detail='') {
+  const el = document.getElementById('status-' + file);
+  if (!el) return;
+  if (ok) {
+    el.className = 'status ok';
+    el.textContent = '✅ PASS';
+  } else {
+    el.className = 'status bad';
+    el.textContent = '❌ BLOCKED' + (detail ? ` (${detail})` : '');
+  }
+}
+
+async function checkFile(file) {
+  try {
+    const res = await fetch(file + '?t=' + Date.now(), { cache: 'no-store' });
+
+    // Heuristics:
+    // - If status not 200 → treat as BLOCKED
+    // - If body contains "Access Blocked" → BLOCKED (your filter’s deny text)
+    // Otherwise PASS.
+    const text = await res.text();
+    const notOK = res.status !== 200;
+    const hasBlockString = /Access\s+Blocked/i.test(text);
+
+    if (notOK || hasBlockString) {
+      setStatus(file, false, notOK ? `HTTP ${res.status}` : 'content');
+      return { file, blocked: true, status: res.status };
+    } else {
+      setStatus(file, true);
+      return { file, blocked: false, status: res.status };
+    }
+  } catch (e) {
+    // Network/other failure → treat as BLOCKED for visibility
+    setStatus(file, false, 'fetch error');
+    return { file, blocked: true, error: String(e) };
+  }
+}
+
+async function runAll() {
+  runBtn.disabled = true;
+  rowsEl.innerHTML = '';
+  summaryEl.textContent = '';
+
+  tests.forEach(t => rowsEl.appendChild(rowTemplate(t)));
+
+  let blocked = 0;
+  for (const t of tests) {
+    const r = await checkFile(t.file);
+    if (r.blocked) blocked++;
+  }
+  summaryEl.textContent = `Done. ${blocked} blocked / ${tests.length} total.`;
+  runBtn.disabled = false;
+}
+
+runBtn.addEventListener('click', runAll);
+</script>
+</body>
+</html>

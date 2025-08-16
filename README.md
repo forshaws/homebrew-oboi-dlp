@@ -90,16 +90,72 @@ LoadModule ext_filter_module lib/httpd/modules/mod_ext_filter.so
 <br /><br />
 
 **D: Add oboi-dlp configuration**
-<br />At the bottom of your ```httpd.conf```, add:
+<br />Towards bottom of your ```httpd.conf```, add:
 
 
 ```ini
 # OBOI-DLP Configuration
-Include /usr/local/etc/httpd/oboi-dlp.conf
+ExtFilterDefine dlpfilterin mode=input cmd="/usr/local/bin/oboi-dlp --mode=input"
+ExtFilterDefine dlpfilterout mode=output cmd="/usr/local/bin/oboi-dlp --mode=output" preservescontentlength
+
+
+<Location "/">
+    SetInputFilter dlpfilterin
+    SetOutputFilter dlpfilterout
+</Location>
 ```
 
 
 Save the file and exit Nano.
+
+**E: Configure the DLP Filter**
+During install Homebrew will install a default ```oboi-dlp.conf``` file in your Homebrew’s etc path (normally ```/usr/local/etc``` or ```/opt/homebrew/etc```), not directly /etc. On startup oboi-dlp will find this file and load it. If it does not exist or is in not in the default directory then oboi-dlp will print a warning in the ```dlpfiler.log``` file.
+
+You can check this log file by running"
+
+```bash
+tail -f /tmp/dlpfilter.log
+
+```
+Look for the log entry that looks like this that indicates a conf path error: 
+
+```ini
+2025-08-16T10:00:44+01:00 Config file not found, using defaults
+```
+The configuration file is a simple format :-
+
+< KEYNAME > = < on/off >, < Threshold (int)>. Setting it ot off means that oboi-dlp will not test this filter.
+
+```
+API Key = on,0
+AWS Key = on,0
+AWS Temp Key = on,0
+Credit Card = on,0
+National ID = on,0
+Sort Code = on,10
+UK Bank Account = on,5
+US Bank Account = on,5
+Phone Number=on,10
+Phone Number USA=on,10
+Email Threshold = 5
+```
+
+```etc.install``` will put it in Homebrew’s etc path (normally ```/usr/local/etc``` or ```/opt/homebrew/etc```), not directly /etc.
+Open the conf file by running: 
+
+```bash
+nano /opt/homebrew/etc/oboi-dlp.conf
+```
+
+or 
+
+```bash
+nano /usr/local/etc/oboi-dlp.conf
+```
+
+Edit the file if you wish, and save with ^O and exit ^X.
+
+<br /><br />
 
 **E: Test and restart Apache**
 Check your Apache configuration for syntax errors:
@@ -190,4 +246,3 @@ unset OBOI_DLP_APIKEY
 **oboi-dlp** trial mode is free to use under the license for personal, educational, and prototyping purposes.
 
 Usage beyond this will require a valid API license key, please [view the API plans](https://toridion.com/oboi-dlp/) for license details for commercial use.
-
