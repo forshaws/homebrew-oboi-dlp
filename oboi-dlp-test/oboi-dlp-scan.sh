@@ -13,7 +13,7 @@ cat <<'EOF'
  ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝   ╚═════╝ ╚══════╝╚═╝ 
 
                  O  B  O  I   -   D  L  P
-           Pen Test Suite v1.0  © 2025 Scot Forshaw
+           Pen Test Suite v0.1.3  © 2025 Scot Forshaw
 ---------------------------------------------------------------------
 EOF
 
@@ -32,36 +32,25 @@ tests=(
   "api_keys.txt|block|API keys (should BLOCK ❌)|ghp_/github_pat_/AIza/JWT patterns"
   "national_ids.txt|block|National ID numbers (should BLOCK ❌)|UK NI / US SSN formats"
   "bank_accounts.txt|block|Account-like numbers (may BLOCK ❌)|Sort code+acct / ABA routing"
-  "sort_codes.txt|mixed|Sort codes + dates (MIXED)❗|Dates pass; genuine sort codes block"
+  "sort_codes.txt|mixed|Sort codes + dates (may BLOCK ❌)|Dates pass; genuine sort codes block"
   "phone_numbers.txt|block|Phone numbers (may BLOCK ❌)|UK E.164 + local mobile patterns"
 )
 
-# --- Placeholder detector (swap with real oboi-dlp call if desired) ---
+# --- Actual detector: fetch and inspect content ---
 check_file() {
-  local file="$1"; local expect="$2"
+  local file="$1"
   local url="http://127.0.0.1/oboi-dlp-test/$file"
 
-  # Fetch file body (quiet but fail on errors)
   local body
   if ! body=$(curl -sSf "$url" 2>/dev/null); then
-    return 2   # missing/unreachable
+    return 2   # unreachable
   fi
 
-  case "$file" in
-    safe.txt) [[ "$expect" == "pass" ]] && return 0 || return 1 ;;
-    emails_3.txt) return 0 ;;
-    emails_6.txt) return 1 ;;
-    creditcards.txt) return 1 ;;
-     aws_keys.txt) return 1 ;;
-    aws_keysx.txt) grep -Eq 'AKIA|ASIA' <<<"$body" && return 1 || return 0 ;;
-    api_keysx.txt) grep -Eq 'ghp_|github_pat_|AIza|eyJ[a-zA-Z0-9_-]*\.' <<<"$body" && return 1 || return 0 ;;
-    national_idsx.txt) grep -Eq '\b[ABCEGHJ-PRSTW-Z]{2}[0-9]{6}[A-D]\b|[0-9]{3}-[0-9]{2}-[0-9]{4}' <<<"$body" && return 1 || return 0 ;;
-    bank_accountsx.txt) grep -Eq '[0-9]{2}-[0-9]{2}-[0-9]{2}.*[0-9]{8}|(^|[^0-9])[0-9]{9}([^0-9]|$)' <<<"$body" && return 1 || return 0 ;;
-     bank_accounts.txt) return 1 ;;
-    sort_codes.txt) return 1 ;; # force "mixed" detection highlight
-    phone_numbers.txt) grep -Eq '\+447[0-9]{9}|0[7][0-9]{9}|\+1[0-9]{10}|[^0-9]202555[0-9]{4}[^0-9]' <<<"$body" && return 1 || return 0 ;;
-    *) return 1 ;;
-  esac
+  if grep -q "Access Blocked" <<<"$body"; then
+    return 1   # blocked
+  else
+    return 0   # passed
+  fi
 }
 
 blocked=0
@@ -75,8 +64,12 @@ for t in "${tests[@]}"; do
   total=$((total+1))
   printf "→ %-18s %-48s " "$file" "$label"
 
-  if check_file "$file" "$expect"; then
-    echo -e "${GREEN}✅ PASS${RESET} — ${reason}"
+  if check_file "$file"; then
+    if [[ "$expect" == "pass" ]]; then
+      echo -e "${GREEN}✅ PASS${RESET} — ${reason}"
+    else
+      echo -e "${RED}❌ UNEXPECTED PASS${RESET} — should have been blocked"
+    fi
   else
     rc=$?
     if [[ $rc -eq 2 ]]; then
@@ -90,7 +83,3 @@ done
 
 echo "---------------------------------------------------------------------"
 echo -e "Summary: ${RED}${blocked} BLOCKED${RESET} / ${total} TOTAL"
-echo
-
-#echo -e "${CYAN}Tip:${RESET} To use the real filter, replace 'check_file' with a call like:"
-#echo '  curl -sSf "http://localhost/fixtures/${file}" | oboi-dlp --explain'
