@@ -1,0 +1,9 @@
+# UK National Insurance numbers (valid format)
+AB123456C
+QQ123456A
+ZZ987654D
+
+# US Social Security Numbers
+123-45-6789
+987-65-4320
+111-22-3333

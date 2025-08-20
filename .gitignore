@@ -1,0 +1,27 @@
+# Compiled binaries
+*.bin
+*.elf
+*.hex
+
+# Arduino build folder
+build/
+
+# Binary builds folder
+releases/
+
+# Arduino backups
+*.bak
+*.tmp
+
+# macOS Finder files
+.DS_Store
+
+# Windows thumbs
+Thumbs.db
+
+#ZIPs or package files
+*.zip
+
+
+# PlatformIO cache (if used)
+.pio/
