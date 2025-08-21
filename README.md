@@ -1,13 +1,124 @@
-## ⌨️ oboi&trade; Data Leakage Protection (DLP)
+# ⌨️ oboi&trade; Data Leakage Protection (DLP)
 
 ![Alt Text](oboi_logo_colour.png)
 
-## 🌟 What is DLP - and what is oboi-dlp? 
+
+
+## ⚡️ TL;DR Install Overview
+**oboi-dlp** is an Apache external filter for Data Loss Prevention (DLP).  
+It inspects HTTP request and response bodies in real time and applies configurable rules for blocking, logging, or alerting.  
+
+Run these commands in your terminal to install:
+
+```bash
+brew tap forshaws/homebrew-oboi-dlp
+brew install oboi-dlp
+```
+
+
+Once you’ve run the Homebrew install, there are three main goals before oboi-dlp is protecting your Apache traffic:
+
+1. **Enable Apache’s** `mod_ext_filter` so we can hook into input/output streams.
+2. **Point Apache at the `oboi-dlp` binary** `(ExtFilterDefine …)`.
+3. **Ensure `oboi-dlp.conf` is found and logs are writable.**
+#
+
+# 🍎 macOS (Intel & Apple Silicon M1)
+**Apache locations (Brew install)**
+
+- **Intel Macs:**  
+  - Apache root: `/usr/local/etc/httpd`  
+  - oboi-dlp.conf: `/usr/local/etc/oboi-dlp.conf`  
+  - Binary: `/usr/local/bin/oboi-dlp`
+
+- **M1 Macs:**  
+  - Apache root: `/opt/homebrew/etc/httpd`  
+  - oboi-dlp.conf: `/opt/homebrew/etc/oboi-dlp.conf`  
+  - Binary: `/opt/homebrew/bin/oboi-dlp`
+
+
+
+**Typical config snippet `(httpd.conf)`**
+```ini
+LoadModule ext_filter_module lib/httpd/modules/mod_ext_filter.so
+
+# OBOI-DLP Configuration
+ExtFilterDefine dlpfilterin mode=input  cmd="/opt/homebrew/bin/oboi-dlp --mode=input"  preservescontentlength
+ExtFilterDefine dlpfilterout mode=output cmd="/opt/homebrew/bin/oboi-dlp --mode=output" preservescontentlength
+
+<Location "/">
+    SetInputFilter dlpfilterin
+    SetOutputFilter dlpfilterout
+</Location>
+```
+## ✅ Pitfalls on Mac
+
+- Forgetting to run `apachectl configtest` after edits.
+- Mixing Intel vs M1 paths (`/usr/local` vs `/opt/homebrew`).
+- Launchd service collisions: if both **Apple’s built-in Apache** and Brew Apache are installed, make sure the Brew one is running (```brew services restart httpd```).
+#
+
+
+# 🐧 Linux
+Depending on your distro/version, Apache may use either a **classic monolithic** `httpd.conf` or the **Debian/Ubuntu-style modular config system** (`sites-available/` + `sites-enabled/`).
+
+**Classic (CentOS/RHEL/Fedora, some Ubuntus)**
+- Apache root: `/etc/httpd/`
+- Config: `/etc/httpd/conf/httpd.conf`
+- Binary: `/home/linuxbrew/.linuxbrew/bin/oboi-dlp` (if installed via Brew)
+- `oboi-dlp.conf`: `/home/linuxbrew/.linuxbrew/etc/oboi-dlp.conf`
+
+Add at end of `httpd.conf`:
+```ini
+LoadModule ext_filter_module modules/mod_ext_filter.so
+
+ExtFilterDefine dlpfilterin  mode=input  cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=input"  preservescontentlength
+ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=output" preservescontentlength
+
+<Location "/">
+    SetInputFilter dlpfilterin
+    SetOutputFilter dlpfilterout
+</Location>
+```
+
+**Debian/Ubuntu (modular config)**
+- Apache root: `/etc/apache2/`
+- Module configs: `/etc/apache2/mods-available/` → enabled via symlink in `/etc/apache2/mods-enabled/`
+- Virtual hosts: `/etc/apache2/sites-available/` → symlinked into `/etc/apache2/sites-enabled/`
+- Binary: `/home/linuxbrew/.linuxbrew/bin/oboi-dlp`
+- `oboi-dlp.conf`: `/home/linuxbrew/.linuxbrew/etc/oboi-dlp.conf`
+
+Steps:
+**1.** Enable module:
+```bash
+sudo a2enmod ext_filter
+```
+
+**2.** Create `/etc/apache2/mods-available/oboi-dlp.conf` with:
+```bash
+ExtFilterDefine dlpfilterin  mode=input  cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=input"  preservescontentlength
+ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=output" preservescontentlength
+```
+**3.** Enable it:
+```bash
+sudo a2enconf oboi-dlp
+sudo systemctl reload apache2
+```
+
+## ✅ Pitfalls on Linux
+- Forgetting `a2enmod ext_filter` (Ubuntu/Debian).
+- Apache not running as the same user that can read/write log paths (`/tmp`, `/var/log/`, etc.).
+- Mixing Brew binary path (`/home/linuxbrew/.linuxbrew/bin`) with system binaries.
+- On systems with **AppArmor/SELinux**, extra permissions may be needed for Apache to execute `oboi-dlp`.
+----
+**Longer version and extra settings,mwhitelists and notifications**
+
+# 🌟 What is DLP - and what is oboi-dlp? 
 **oboi-dlp;** is a DLP filter that protects your data from being leaked to third parties becuase of error, ommission or undetected vulnerabilities in your system. **oboi-dlp** installs as a Apache module that intelligently filters inbound and outbound payloads and blocks them from being served if they contain sensitive data. It also notifies you if exfiltration blocking has happened, then formats these notifications in to weekly audit reports that will import easily into your IMS (integrated Quality Management System) for compliance and quality reporting.
 
 **oboi-dlp** has the ability to utilise TORIDION's TQNN FraudTagger scoreUsername API to detect POST payloads contaning email/usernames and validate against their enterprise fraud detection model at server level rather than code level. This added protection helps your web service/api/mobile apps flag or even block suspicious emails. Existing oboi licenses will be detected and used without further configuration!
 
-<br /><br />
+
 ## ⚙️ Version 0.1.4 
 
 ⦿ **oboi-dlp still in beta**
@@ -26,12 +137,11 @@
 
 ⦿ **Email/Username scoring** against enterprise grade fraud detection API
 
-<br /><br />
 
 ## 💻 Beta Status
 
 This software is in non commerical beta until this notice is removed
-<br /><br /><br />
+
 ## ⚙️ Installation Instructions
 
 ### **Step 1: Install the tap and oboi-dlp**
@@ -42,11 +152,19 @@ brew tap forshaws/homebrew-oboi-dlp
 brew install oboi-dlp
 ```
 
+That concludes the installation of oboi-dlp binaries and test suite.
+
+------
+
 ### **Step 2: Enable oboi-dlp in Apache**
 
-In Step 1, you installed the **oboi-dlp** software. Now, you simply need to enable it in Apache by finding your active ```httpd.conf``` file and adding the required lines.
-<br />
-<br />
+In Step 1, you installed the **oboi-dlp** software. Now, you simply need to enable it in Apache.
+
+How you setup Apache on your system will dictate how you need to proceed. 
+
+
+### **Installation**
+ by finding your active ```httpd.conf``` file and adding the required lines.
 
 **A: Locate your Apache installation**
 <br />Run:
@@ -60,12 +178,10 @@ apachectl -V | grep HTTPD_ROOT
 ```
 
 This will tell you where Apache is installed.
-<br />
-<br />
-
 
 **B: Find your active httpd.conf**
-<br />Run:
+
+Run:
 
 ```bash
 apachectl -V | grep SERVER_CONFIG_FILE
@@ -80,21 +196,20 @@ You can open it directly with:
 nano $(apachectl -V | grep SERVER_CONFIG_FILE | cut -d'"' -f2)
 ```
 
-
-
 **C: Enable the required Apache modules**
-<br />Inside httpd.conf, ensure this line is uncommented (remove the # if present):
+
+Inside httpd.conf, ensure this line is uncommented (remove the # if present):
 
 ```apache
 LoadModule ext_filter_module lib/httpd/modules/mod_ext_filter.so
 ```
 **note** the module path may differ from ```lib/httpd/modules/```. The important thing is to find the start of the line <br /> 
 ```#LoadModule ext_filter_module``` and uncomment it.
-<br /><br />
+
 
 **D: Add oboi-dlp configuration**
-<br />Towards bottom of your ```httpd.conf```, add:
 
+Towards bottom of your ```httpd.conf```, add:
 
 ```ini
 # OBOI-DLP Configuration
@@ -190,7 +305,8 @@ Edit the file if you wish, and save with ^O and exit ^X.
 **F: System and CAPA Log Files:** oboi-dlp outputs critical evens like intrusions and attempts to access sensitive date in the ```capa.log``` and system related events in ```dlpfilter.log```. Initially these logs will be created in your ```/tmp``` folder. You can change this behaviour once you are happy that oboi-dlp is working as you expect. 
 
 Due to the sheer number of ways sysadmins may want to use the logs, we left this up to the user. To make life easy for you, oboi-dlp looks for an environment variable for each of the logs.  For ```capa.log``` the env is ```OBOI_DLP_CAPALOGPATH```. For the ```dlpfilter.log``` the env is ```OBOI_DLP_SYSTEMLOGPATH```. The env paths are ideally set in the Apache ```httpd.conf``` (**see section D**) for details of that.
-<br /><br />
+
+
 For example, you can set the path to something like ```/usr/local/var/log/capa.log```. Just rememebr to update the permissisons so that oboi-dpl can access it. The ```httpd.conf``` extract below shows the ```capa.log``` enabled  by way of renoveing the # (Uncommenting the line)
 
 ```ini
@@ -220,7 +336,8 @@ You can add fancy logging to you tail by making the [CAPA] events **RED** in col
  tail -f /usr/local/var/log/capa.log | sed 's/^/\x1b[31m[CAPA]\x1b[0m /'
  ```
 ![Alt Text](capa_fancy.png)
-<br /><br />
+
+
 
 **G: Enable NTFY notifications**
 oboi-dlp is designed to work seamlessly with the popular ntfy.sh notification engine. All you need to do is tell oboi-dlp that you ahve a valid ```topic``` and it will automtically send critical alerts to that topic!
@@ -233,8 +350,6 @@ SetEnv OBOI_DLP_TOPIC "your_topic_name_here"
 
 ```
 
-<br />
-
 **H: Test and restart Apache**
 Check your Apache configuration for syntax errors:
 
@@ -246,7 +361,7 @@ If there are no warnings, restart Apache to apply changes (your restart may be d
 ```bash
 sudo apachectl restart
 ```
-<br /><br />
+
 ## **🛠 Test your setup**
 
 oboi-dlp is invoked automatically by Apache when a file is served. If the oboi-dlp intelligent filter determine the data in the file to be sensitive it will simply block it outright and serve the message Access Blocked. A ```[CAPA]``` log entry will be added to you ```/tmp/cap.log``` or whatever log you have set. 
@@ -273,7 +388,7 @@ The output should be something like shown below.
 
 **⚠️IMPORTANT⚠️ When you are happy the system is working REMOVE the test suite**
 
-<br /><br />
+
 ## **🛠 Useful Apache Commands**
 
 Check Apache status:
@@ -307,8 +422,6 @@ sudo apachectl restart
 ```
 
 
-
-<br /><br />
 ## ⚙️ Uninstall Instructions  
 
 Run this command in your terminal:
@@ -317,9 +430,6 @@ Run this command in your terminal:
 brew uninstall oboi-dlp
 ```
 
-
-
-<br /><br />
 
 ## 📧 Usage Instructions 
 
@@ -347,10 +457,6 @@ Remove the key using the following command:
 ```bash
 unset OBOI_DLP_APIKEY
 ```
-
-
-
-
 
 ## 🔐 Free Usage & Fair Use
 
