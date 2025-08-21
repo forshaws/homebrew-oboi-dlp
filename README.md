@@ -215,6 +215,11 @@ or in the latter case of a custom log
 tail -f /usr/local/var/log/capa.log
 ```
 
+You can add fancy logging to you tail by making the [CAPA] events **RED** in colour
+```bash
+ tail -f /usr/local/var/log/capa.log | sed 's/^/\x1b[31m[CAPA]\x1b[0m /'
+ ```
+![Alt Text](capa_fancy.png)
 <br /><br />
 
 **G: Enable NTFY notifications**
@@ -246,7 +251,27 @@ sudo apachectl restart
 
 oboi-dlp is invoked automatically by Apache when a file is served. If the oboi-dlp intelligent filter determine the data in the file to be sensitive it will simply block it outright and serve the message Access Blocked. A ```[CAPA]``` log entry will be added to you ```/tmp/cap.log``` or whatever log you have set. 
 
+## **💻 Using the test suite**
 
+Clone the repo to your local and copy the folder ```obpoi-dlp-test``` to you web root. There are several tools in there. Paticularly ```http://127.0.0.1/oboi-dlp-test/test_oboi_dlp.html``` (or whatever path you have).
+
+FYI: The oboi-dlp-test folder is also bundles with brew pkg and you will see some instructions during install that more expert users may find easier.
+
+The tool sequentially tries to load the test assets in the folder and shows if they are blocked or passed. Some should be passed according to the default oboi-dlp.conf.
+
+![Alt Text](oboi-test-html.png)
+
+There is also a bash version ```./oboi-dlp-scan.sh```. cd into your directory and run it form the command line.
+
+```bash
+./oboi-dlp-scan.sh
+```
+
+The output should be something like shown below.
+
+![Alt Text](oboi-test-sh.png)
+
+**⚠️IMPORTANT⚠️ When you are happy the system is working REMOVE the test suite**
 
 <br /><br />
 ## **🛠 Useful Apache Commands**
