@@ -42,6 +42,19 @@ Once you’ve run the Homebrew install, there are three main goals before oboi-d
 ```ini
 LoadModule ext_filter_module lib/httpd/modules/mod_ext_filter.so
 
+
+#Uncomment the lines below if you want custom logs or ntfy support
+
+#optional env variables to set a ntfy.sh topic. See https://docs.ntfy.sh/
+#SetEnv OBOI_DLP_TOPIC "your_topic_name_here"
+
+#optional env variables to set oboi log paths
+#SetEnv OBOI_DLP_SYSTEMLOGPATH /usr/local/var/log/dlpfilter.log
+#SetEnv OBOI_DLP_CAPALOGPATH /usr/local/var/log/capa.log
+
+#set oboi-dlp API KEY (if purchased) See https://toridion.com/oboi-dlp for details
+#SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
+
 # OBOI-DLP Configuration
 ExtFilterDefine dlpfilterin mode=input  cmd="/opt/homebrew/bin/oboi-dlp --mode=input"  preservescontentlength
 ExtFilterDefine dlpfilterout mode=output cmd="/opt/homebrew/bin/oboi-dlp --mode=output" preservescontentlength
@@ -56,6 +69,22 @@ ExtFilterDefine dlpfilterout mode=output cmd="/opt/homebrew/bin/oboi-dlp --mode=
 - Forgetting to run `apachectl configtest` after edits.
 - Mixing Intel vs M1 paths (`/usr/local` vs `/opt/homebrew`).
 - Launchd service collisions: if both **Apple’s built-in Apache** and Brew Apache are installed, make sure the Brew one is running (```brew services restart httpd```).
+
+
+**⚠️IMPORTANT⚠️ custom logs will need to be created by you first**
+
+Example:
+```bash
+touch /usr/local/var/log/capa.log
+touch /usr/local/var/log/dlpfilter.log
+sudo chgrp _www capa.log
+sudo chgrp _www dlpfilter.log
+chmod 0770 capa.log
+chmod 0770 dlpfilter.log
+```
+
+If you set the env in httpd.conf then oboi-dlp will try top use the logs you say (as long as they are there)
+
 #
 
 
@@ -71,6 +100,19 @@ Depending on your distro/version, Apache may use either a **classic monolithic**
 Add at end of `httpd.conf`:
 ```ini
 LoadModule ext_filter_module modules/mod_ext_filter.so
+
+
+#Uncomment the lines below if you want custom logs or ntfy support
+
+#optional env variables to set a ntfy.sh topic. See https://docs.ntfy.sh/
+#SetEnv OBOI_DLP_TOPIC "your_topic_name_here"
+
+#optional env variables to set oboi log paths
+#SetEnv OBOI_DLP_SYSTEMLOGPATH /usr/local/var/log/dlpfilter.log
+#SetEnv OBOI_DLP_CAPALOGPATH /usr/local/var/log/capa.log
+
+#set oboi-dlp API KEY (if purchased) See https://toridion.com/oboi-dlp for details
+#SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
 
 ExtFilterDefine dlpfilterin  mode=input  cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=input"  preservescontentlength
 ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=output" preservescontentlength
@@ -94,14 +136,40 @@ Steps:
 sudo a2enmod ext_filter
 ```
 
-**2.** Create `/etc/apache2/mods-available/oboi-dlp.conf` with:
+**2.** Create `/etc/apache2/mods-available/ext_filter.conf` adding the lines:
+
+
 ```bash
+nano /etc/apache2/mods-available/ext_filter.conf
+```
+Then add the lines:
+```ini
+
+#Uncomment the lines below if you want custom logs or ntfy support
+
+#optional env variables to set a ntfy.sh topic. See https://docs.ntfy.sh/
+#SetEnv OBOI_DLP_TOPIC "your_topic_name_here"
+
+#optional env variables to set oboi log paths
+#SetEnv OBOI_DLP_SYSTEMLOGPATH /usr/local/var/log/dlpfilter.log
+#SetEnv OBOI_DLP_CAPALOGPATH /usr/local/var/log/capa.log
+
+#set oboi-dlp API KEY (if purchased) See https://toridion.com/oboi-dlp for details
+#SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
+
+# OBOI-DLP Configuration
 ExtFilterDefine dlpfilterin  mode=input  cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=input"  preservescontentlength
 ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=output" preservescontentlength
+
+<Location "/">
+    SetInputFilter dlpfilterin
+    SetOutputFilter dlpfilterout
+</Location>
+
 ```
-**3.** Enable it:
+**3.** Enable it by saving the file and reloading apache2:
+
 ```bash
-sudo a2enconf oboi-dlp
 sudo systemctl reload apache2
 ```
 
@@ -110,6 +178,23 @@ sudo systemctl reload apache2
 - Apache not running as the same user that can read/write log paths (`/tmp`, `/var/log/`, etc.).
 - Mixing Brew binary path (`/home/linuxbrew/.linuxbrew/bin`) with system binaries.
 - On systems with **AppArmor/SELinux**, extra permissions may be needed for Apache to execute `oboi-dlp`.
+- Running oboi-dlp in user mode may cause it to create install files that will not be writeable by Apache invoked oboi-dlp. You should try and let oboi-dlp create its own install tmp folder in `/tmp/oboi-dlp/` that will be writeable by Apache and the software.
+
+
+**⚠️IMPORTANT⚠️ custom logs will need to be created by you first**
+
+Example:
+```bash
+touch /usr/local/var/log/capa.log
+touch /usr/local/var/log/dlpfilter.log
+sudo chgrp _www capa.log
+sudo chgrp _www dlpfilter.log
+chmod 0770 capa.log
+chmod 0770 dlpfilter.log
+```
+
+If you set the env in httpd.conf then oboi-dlp will try top use the logs you say (as long as they are there)
+
 ----
 **Longer version and extra settings,mwhitelists and notifications**
 
@@ -119,7 +204,7 @@ sudo systemctl reload apache2
 **oboi-dlp** has the ability to utilise TORIDION's TQNN FraudTagger scoreUsername API to detect POST payloads contaning email/usernames and validate against their enterprise fraud detection model at server level rather than code level. This added protection helps your web service/api/mobile apps flag or even block suspicious emails. Existing oboi licenses will be detected and used without further configuration!
 
 
-## ⚙️ Version 0.1.4 
+## ⚙️ Version 0.1.5
 
 ⦿ **oboi-dlp still in beta**
 
@@ -212,6 +297,18 @@ LoadModule ext_filter_module lib/httpd/modules/mod_ext_filter.so
 Towards bottom of your ```httpd.conf```, add:
 
 ```ini
+#Uncomment the lines below if you want custom logs or ntfy support
+
+#optional env variables to set a ntfy.sh topic. See https://docs.ntfy.sh/
+#SetEnv OBOI_DLP_TOPIC "your_topic_name_here"
+
+#optional env variables to set oboi log paths
+#SetEnv OBOI_DLP_SYSTEMLOGPATH /usr/local/var/log/dlpfilter.log
+#SetEnv OBOI_DLP_CAPALOGPATH /usr/local/var/log/capa.log
+
+#set oboi-dlp API KEY (if purchased) See https://toridion.com/oboi-dlp for details
+#SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
+
 # OBOI-DLP Configuration
 
 ExtFilterDefine dlpfilterin mode=input cmd="/usr/local/bin/oboi-dlp --mode=input" preservescontentlength
@@ -228,17 +325,7 @@ ExtFilterDefine dlpfilterout mode=output cmd="/usr/local/bin/oboi-dlp --mode=out
     
 </Location>
 
-#Uncomment the lines below if you want custom logs or ntfy support
 
-#optional env variables to set a ntfy.sh topic. See https://docs.ntfy.sh/
-#SetEnv OBOI_DLP_TOPIC "your_topic_name_here"
-
-#optional env variables to set oboi log paths
-#SetEnv OBOI_DLP_SYSTEMLOGPATH /usr/local/var/log/dlpfilter.log
-#SetEnv OBOI_DLP_CAPALOGPATH /usr/local/var/log/capa.log
-
-#set oboi-dlp API KEY (if purchased) See https://toridion.com/oboi-dlp for details
-#SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
 
 ```
 
@@ -315,7 +402,7 @@ For example, you can set the path to something like ```/usr/local/var/log/capa.l
 SetEnv OBOI_DLP_CAPALOGPATH /usr/local/var/log/capa.log
 ```
 
-Similarly the CAPA log can be set toi a custom path using something like:
+Similarly the CAPA log can be set to a custom path using something like:
 ```bash
 export OBOI_DLP_CAPALOGPATH=/var/log/capa.log 
 ```
@@ -337,7 +424,19 @@ You can add fancy logging to you tail by making the [CAPA] events **RED** in col
  ```
 ![Alt Text](capa_fancy.png)
 
+**⚠️IMPORTANT⚠️ custom logs will need to be created by you first**
 
+Example:
+```bash
+touch /usr/local/var/log/capa.log
+touch /usr/local/var/log/dlpfilter.log
+sudo chgrp _www capa.log
+sudo chgrp _www dlpfilter.log
+chmod 0770 capa.log
+chmod 0770 dlpfilter.log
+```
+
+If you set the env in httpd.conf then oboi-dlp will try top use the logs you say (as long as they are there)
 
 **G: Enable NTFY notifications**
 oboi-dlp is designed to work seamlessly with the popular ntfy.sh notification engine. All you need to do is tell oboi-dlp that you ahve a valid ```topic``` and it will automtically send critical alerts to that topic!

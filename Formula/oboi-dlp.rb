@@ -1,22 +1,22 @@
 class OboiDlp < Formula
   desc "oboi-dlp — A fast efficient DLP tool for Apache systems"
   homepage "https://toridion.com/oboi-dlp/"
-  version "0.1.4"  # change if you use a different tag
+  version "0.1.5"  # change if you use a different tag
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.4/oboi-dlp-darwin-arm64.tar.gz"
-      sha256 "e39a5acbbf53d8ae747f03dc9c83c05251a00345e2e8122ba45a063e79ee1eb1"
+      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.5/oboi-dlp-darwin-arm64.tar.gz"
+      sha256 "29a99bc319fa02475519e078c437034c0613abe200e629acb2e598421dc6a18e"
     else
-      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.4/oboi-dlp-darwin-amd64.tar.gz"
-      sha256 "de7029db3c5b9f5fada8654f5d92c0086115868df4a75ab753f6c1ad6e8ca8d0"
+      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.5/oboi-dlp-darwin-amd64.tar.gz"
+      sha256 "017bfeb8ef11319727437eb60af943e32ec4b01d16755957e4ca2c71a2d050a7"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.4/oboi-dlp-linux-amd64.tar.gz"
-      sha256 "8d996a25e9ec96965f111c8ae15c7305798bfe490829addb9998970ba69a0b21"
+      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.5/oboi-dlp-linux-amd64.tar.gz"
+      sha256 "1d976921f0989af192d35cad90660b0e5f18c0ec5e9cc17851a981dd4bcf5422"
     else
       odie "No Linux ARM build available"
     end
@@ -28,11 +28,11 @@ class OboiDlp < Formula
     pkgshare.install "oboi-dlp-test"
     
     # Create log directory
-    log_dir = var/"log/oboi-dlp"
-    log_dir.mkpath
+    #log_dir = var/"log/oboi-dlp"
+    #log_dir.mkpath
 
     # Optional: set permissions so non-root users (or Apache _www) can write
-    log_dir.chmod 0755
+    #log_dir.chmod 0755
   end
   
   def caveats
@@ -53,7 +53,7 @@ class OboiDlp < Formula
   end
 
   test do
-    # Adjust to an actual test your binary supports
+    # version
     system "#{bin}/oboi-dlp", "--version"
   end
 end
