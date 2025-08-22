@@ -1,22 +1,22 @@
 class OboiDlp < Formula
   desc "oboi-dlp — A fast efficient DLP tool for Apache systems"
   homepage "https://toridion.com/oboi-dlp/"
-  version "0.1.7"  # change if you use a different tag
+  version "0.1.8"  # change if you use a different tag
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.7/oboi-dlp-darwin-arm64.tar.gz"
-      sha256 "8d1992ae67b79ef3a83d64b77f4bb808858ed585c9f2c12417b232d057293909"
+      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.8/oboi-dlp-darwin-arm64.tar.gz"
+      sha256 "385e2f0e75624eed4a3ea6b7b2235979950c1674b8c349adf3463e7ee915182a"
     else
-      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.7/oboi-dlp-darwin-amd64.tar.gz"
-      sha256 "fb8a8693695fe7260c7a0dfd3eeb63cd2f332f4528a30e43f02d332ac69ccaa1"
+      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.8/oboi-dlp-darwin-amd64.tar.gz"
+      sha256 "e90a642608a5e729b7227cf9c5cb01fb461704812a06e11349d2a95e421b9088"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.7/oboi-dlp-linux-amd64.tar.gz"
-      sha256 "bb8095edde3c4d6dc6554149c31f24c10637caea8b4fd6e4ed81c83afaf22108"
+      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.8/oboi-dlp-linux-amd64.tar.gz"
+      sha256 "44d05750fbe960cd722c61d8701a687877752251c984afbeff20a6bbd31f71f4"
     else
       odie "No Linux ARM build available"
     end
