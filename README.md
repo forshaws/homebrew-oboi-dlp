@@ -1,4 +1,4 @@
-# ⌨️ # ⌨️ oboi&trade; Data Leakage Protection (DLP)
+# ⌨️ oboi&trade; Data Leakage Protection (DLP)
 
 ![oboi logo](oboi_logo_colour.png)
 
