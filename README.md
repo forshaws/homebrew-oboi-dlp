@@ -1,4 +1,4 @@
-# ⌨️ oboi&trade; Data Leakage Protection (DLP)
+# ⌨️ # ⌨️ oboi&trade; Data Leakage Protection (DLP)
 
 ![oboi logo](oboi_logo_colour.png)
 
@@ -38,6 +38,15 @@ Add to your `httpd.conf`:
 # Enable external filter module
 LoadModule ext_filter_module lib/httpd/modules/mod_ext_filter.so
 
+# OBOI-DLP Filter Definition
+ExtFilterDefine dlpfilterin mode=input cmd="/opt/homebrew/bin/oboi-dlp --mode=input" preservescontentlength
+ExtFilterDefine dlpfilterout mode=output cmd="/opt/homebrew/bin/oboi-dlp --mode=output" preservescontentlength
+
+<Location "/">
+    SetInputFilter dlpfilterin
+    SetOutputFilter dlpfilterout
+</Location>
+
 # Optional: Custom log paths (create these files first with proper permissions)
 #SetEnv OBOI_DLP_SYSTEMLOGPATH /usr/local/var/log/dlpfilter.log
 #SetEnv OBOI_DLP_CAPALOGPATH /usr/local/var/log/capa.log
@@ -48,14 +57,6 @@ LoadModule ext_filter_module lib/httpd/modules/mod_ext_filter.so
 # Optional: API key for licensed features
 #SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
 
-# OBOI-DLP Filter Definition
-ExtFilterDefine dlpfilterin mode=input cmd="/opt/homebrew/bin/oboi-dlp --mode=input" preservescontentlength
-ExtFilterDefine dlpfilterout mode=output cmd="/opt/homebrew/bin/oboi-dlp --mode=output" preservescontentlength
-
-<Location "/">
-    SetInputFilter dlpfilterin
-    SetOutputFilter dlpfilterout
-</Location>
 ```
 
 **Note:** Update the binary path based on your architecture (Intel: `/usr/local/bin/oboi-dlp`, Apple Silicon: `/opt/homebrew/bin/oboi-dlp`)
@@ -72,15 +73,11 @@ ExtFilterDefine dlpfilterout mode=output cmd="/opt/homebrew/bin/oboi-dlp --mode=
 
 ### Distribution-Specific Paths
 
-**RHEL/CentOS/Fedora:**
-- Apache config: `/etc/httpd/conf/httpd.conf`
-- Binary: `/home/linuxbrew/.linuxbrew/bin/oboi-dlp`
-- oboi-dlp.conf: `/home/linuxbrew/.linuxbrew/etc/oboi-dlp.conf`
 
-**Ubuntu/Debian:**
-- Apache root: `/etc/apache2/`
-- Binary: `/home/linuxbrew/.linuxbrew/bin/oboi-dlp`
-- oboi-dlp.conf: `/home/linuxbrew/.linuxbrew/etc/oboi-dlp.conf`
+| Architecture | Apache Config/root | oboi-dlp.conf | Binary |
+|--------------|-------------------|---------------|--------|
+| RHEL/CentOS/<br>Fedora | `/etc/httpd/conf/`<br>`httpd.conf` | `/home/linuxbrew/.linuxbrew/`<br>`etc/oboi-dlp.conf` | `/home/linuxbrew/.linuxbrew/`<br>`bin/oboi-dlp` |
+| Ubuntu/<br>Debian | `/etc/apache2/` | `/home/linuxbrew/.linuxbrew/`<br>`etc/oboi-dlp.conf` | `/home/linuxbrew/.linuxbrew/`<br>`bin/oboi-dlp` |
 
 ### RHEL/CentOS/Fedora Setup
 
@@ -88,6 +85,15 @@ Add to `/etc/httpd/conf/httpd.conf`:
 
 ```apache
 LoadModule ext_filter_module modules/mod_ext_filter.so
+
+# OBOI-DLP Configuration
+ExtFilterDefine dlpfilterin mode=input cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=input" preservescontentlength
+ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=output" preservescontentlength
+
+<Location "/">
+    SetInputFilter dlpfilterin
+    SetOutputFilter dlpfilterout
+</Location>
 
 # Optional: Custom log paths (create these files first with proper permissions)
 #SetEnv OBOI_DLP_SYSTEMLOGPATH /usr/local/var/log/dlpfilter.log
@@ -99,14 +105,6 @@ LoadModule ext_filter_module modules/mod_ext_filter.so
 # Optional: API key for licensed features
 #SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
 
-# OBOI-DLP Configuration
-ExtFilterDefine dlpfilterin mode=input cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=input" preservescontentlength
-ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=output" preservescontentlength
-
-<Location "/">
-    SetInputFilter dlpfilterin
-    SetOutputFilter dlpfilterout
-</Location>
 ```
 
 ### Ubuntu/Debian Setup
@@ -123,16 +121,6 @@ ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/obo
 
    Add:
    ```apache
-   # Optional: Custom log paths (create these files first with proper permissions)
-   #SetEnv OBOI_DLP_SYSTEMLOGPATH /usr/local/var/log/dlpfilter.log
-   #SetEnv OBOI_DLP_CAPALOGPATH /usr/local/var/log/capa.log
-
-   # Optional: ntfy.sh notifications
-   #SetEnv OBOI_DLP_TOPIC "your_topic_name_here"
-
-   # Optional: API key for licensed features
-   #SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
-
    # OBOI-DLP Configuration
    ExtFilterDefine dlpfilterin mode=input cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=input" preservescontentlength
    ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/oboi-dlp --mode=output" preservescontentlength
@@ -141,6 +129,16 @@ ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/obo
        SetInputFilter dlpfilterin
        SetOutputFilter dlpfilterout
    </Location>
+
+   # Optional: Custom log paths (create these files first with proper permissions)
+   #SetEnv OBOI_DLP_SYSTEMLOGPATH /usr/local/var/log/dlpfilter.log
+   #SetEnv OBOI_DLP_CAPALOGPATH /usr/local/var/log/capa.log
+ 
+   # Optional: ntfy.sh notifications
+   #SetEnv OBOI_DLP_TOPIC "your_topic_name_here"
+ 
+   # Optional: API key for licensed features
+   #SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
    ```
 
 3. **Reload Apache:**
@@ -152,7 +150,7 @@ ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/obo
 
 - **SELinux (RHEL/CentOS/Fedora):** May require additional permissions
 - **AppArmor (Ubuntu/Debian):** Generally more permissive for standard operations
-- **systemd PrivateTmp:** Check if Apache has private temp namespace that could affect file operations
+- **systemd PrivateTmp:** Check if Apache has private temp namespace that could affect file operations. See the **PrivateTmp & oboi-dlp** section for detailed information.
 
 ---
 
@@ -163,6 +161,9 @@ oboi-dlp automatically creates its working directory at `/var/tmp/oboi-dlp` with
 - Cross-platform compatibility (Linux & macOS)
 - Persistence across reboots
 - Proper web server access permissions
+
+### ⚠️ PrivateTmp & oboi-dlp
+Many Apache installs are configured to use `PrivateTmp=on` and oboi-dlp is designed to handle this without any changes to your security posture. **note** - no amount of chmod/chown will overide PrivateTmp. The first time oboi-dlp is called by Apache (or other calling process/server) it will try and determine if it can use `/var/tmp/oboi-dlp` to build its instal files. If PrivateTmp is on, it will build these files in the private directory space. For most systems this will be a folder named something like `/var/tmp/system.d-xxxxxxxxx-apache2/var/tmp/oboi-dlp/`. You can create a symlink to the oboi-dlp log files insode this folder to tail them or copy them to a locally writeable folder if you need this.
 
 ---
 
@@ -221,6 +222,9 @@ tail -f /usr/local/var/log/capa.log
 tail -f /var/tmp/oboi-dlp/capa.log | sed 's/^/\x1b[31m[CAPA]\x1b[0m /'
 ```
 
+Example of tailing CAPA logs with colour coding
+![oboi logo](capa-fancy.png)
+
 ### ntfy.sh Notifications
 
 Enable real-time alerts by setting your ntfy topic:
@@ -241,6 +245,12 @@ The installation includes a comprehensive test suite. Copy `oboi-dlp-test/` to y
 - **Command line:** `./oboi-dlp-scan.sh`
 
 **⚠️ Remove the test suite after verification**
+
+The command line interface
+![oboi logo](oboi-test-sh.png)
+
+The web interface
+![oboi logo](oboi-test-html.png)
 
 ### Manual Testing
 
@@ -319,4 +329,4 @@ Remove configuration from `httpd.conf` and restart Apache.
 
 ---
 
-**Version 0.1.7 Beta** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)
+**Version 0.1.9** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)
