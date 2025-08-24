@@ -308,8 +308,24 @@ Visit [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/) for licensing deta
 
 ## 🚮 Uninstall
 
+Basic uninstall
+
 ```bash
 brew uninstall oboi-dlp
+brew untap forshaws/homebrew-oboi-dlp
+```
+
+Deep uninstall with cache clearing - can help sometimes if you have meddled.
+
+```bash
+brew uninstall oboi-dlp
+brew cleanup -s
+rm -f "$(brew --cache)"/oboi-dlp-*
+brew info oboi-dlp
+find /usr/local -name "*oboi-dlp*" 2>/dev/null
+find /opt/homebrew -name "*oboi-dlp*" 2>/dev/null
+find ~/Library/Caches/Homebrew -name "*oboi-dlp*" 2>/dev/null
+find ~/Library/Logs/Homebrew -name "*oboi-dlp*" 2>/dev/null
 brew untap forshaws/homebrew-oboi-dlp
 ```
 
