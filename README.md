@@ -1,6 +1,6 @@
 # ⌨️ oboi&trade; Data Leakage Protection (DLP)
 
-![oboi logo](oboi_logo_colour.png)
+![oboi logo](oboi_logo_colour_obee.png)
 
 **oboi-dlp** is an Apache external filter for Data Loss Prevention (DLP) that inspects HTTP request and response bodies in real time, applying configurable rules for blocking, logging, or alerting on sensitive data.
 
