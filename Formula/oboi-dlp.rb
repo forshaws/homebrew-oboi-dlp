@@ -1,29 +1,58 @@
 class OboiDlp < Formula
   desc "oboi-dlp — A fast efficient DLP tool for Apache systems"
   homepage "https://toridion.com/oboi-dlp/"
-  version "0.1.9"  # change if you use a different tag
+  version "0.2.0"  # change if you use a different tag
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.9/oboi-dlp-darwin-arm64.tar.gz"
-      sha256 "2422c49a062f08c71deba6a6dbdeda0f125aba2d4d6641fb298c91bc5743e5ff"
+      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.2.0/oboi-dlp-darwin-arm64.tar.gz"
+      sha256 "cb10a644839b2572d216323c27afb7cc7dc6fd1de80da606f93123176b49b686"
     else
-      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.9/oboi-dlp-darwin-amd64.tar.gz"
-      sha256 "545e2016d4d5e3057cde6c82a254801db866a748e2c335b9107dcb1294174d12"
+      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.2.0/oboi-dlp-darwin-amd64.tar.gz"
+      sha256 "c3aaab53270aab03ee35f54f96f38ecfef437d7994192e274d02c58436113f01"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.1.9/oboi-dlp-linux-amd64.tar.gz"
-      sha256 "b08d862bee9251e747bcc78f3f1c73441852ac9f97b2b623961a81d3fe16e0c2"
+      url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.2.0/oboi-dlp-linux-amd64.tar.gz"
+      sha256 "adc47f76430ebaf01cdcb70d77b6511092345b394314fbb8ddc3da413241233c"
     else
       odie "No Linux ARM build available"
     end
   end
 
   def install
+  
+      # ASCII banner
+    ohai <<~BANNER
+
+       ██████╗ ██████╗  ██████╗ ██╗   ██████╗ ██╗     ██████╗
+      ██╔═══██╗██╔══██╗██╔═══██╗██║   ██╔══██╗██║     ██╔══██╗
+      ██║   ██║██████╔╝██║   ██║██║   ██║  ██║██║     ██████╔╝
+      ██║   ██║██╔══██╗██║   ██║██║   ██║  ██║██║     ██╔═
+      ╚██████╔╝██████║╚ ██████╔╝██║   ██████╔╝███████╗██║ 
+       ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝   ╚═════╝ ╚══════╝╚═╝ 
+
+                     O  B  O  I   -   D  L  P
+         Data Leak Protection v#{version}  © 2025 Scot Forshaw Toridion
+      ---------------------------------------------------------------------
+      
+      
+             ,_,       
+            (O,O)      <- Obee the Owl
+            (   )      
+             " "       
+            /   \      
+           //   \\     
+          ||     ||    
+          ^^     ^^    
+
+    BANNER
+  
+    ohai "Starting installation of OBOI-DLP..."
     bin.install "oboi-dlp"
+    ohai "OBOI-DLP installed successfully!"
     etc.install "oboi-dlp.conf"
     pkgshare.install "oboi-dlp-test"
     
