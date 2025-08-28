@@ -23,36 +23,8 @@ class OboiDlp < Formula
   end
 
   def install
-  
-      # ASCII banner
-    ohai <<~BANNER
 
-       ██████╗ ██████╗  ██████╗ ██╗   ██████╗ ██╗     ██████╗
-      ██╔═══██╗██╔══██╗██╔═══██╗██║   ██╔══██╗██║     ██╔══██╗
-      ██║   ██║██████╔╝██║   ██║██║   ██║  ██║██║     ██████╔╝
-      ██║   ██║██╔══██╗██║   ██║██║   ██║  ██║██║     ██╔═
-      ╚██████╔╝██████║╚ ██████╔╝██║   ██████╔╝███████╗██║ 
-       ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝   ╚═════╝ ╚══════╝╚═╝ 
-
-                     O  B  O  I   -   D  L  P
-         Data Leak Protection v#{version}  © 2025 Scot Forshaw Toridion
-      ---------------------------------------------------------------------
-      
-      
-             ,_,       
-            (O,O)      <- Obee the Owl
-            (   )      
-             " "       
-            /   \      
-           //   \\     
-          ||     ||    
-          ^^     ^^    
-
-    BANNER
-  
-    ohai "Starting installation of OBOI-DLP..."
     bin.install "oboi-dlp"
-    ohai "OBOI-DLP installed successfully!"
     etc.install "oboi-dlp.conf"
     pkgshare.install "oboi-dlp-test"
     
