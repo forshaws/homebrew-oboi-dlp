@@ -290,7 +290,7 @@ brew services {start|stop|restart} httpd
 ## 🔐 Licensing
 
 
-**oboi-dlp** is a commerical software product and requires a valid API key to function. Visit [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/) to obtain a commerical license API key.
+**oboi-dlp** is a commercial software product and requires a valid API key to function fully. Visit [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/) to obtain a commerical license API key.
 
 
 Set your license key in Apache configuration:
@@ -298,7 +298,7 @@ Set your license key in Apache configuration:
 ```apache
 SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
 ```
-Once you have netered your API Key you should restart apache.
+Once you have entered your API Key you should restart apache.
 
 ## 🦉 Community and Trial Modes
 
