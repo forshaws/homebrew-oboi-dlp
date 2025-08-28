@@ -6,17 +6,17 @@ class OboiDlp < Formula
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.2.0/oboi-dlp-darwin-arm64.tar.gz"
-      sha256 "cb10a644839b2572d216323c27afb7cc7dc6fd1de80da606f93123176b49b686"
+      sha256 "a8d7f1a28806979a948750c11bc42ce2078ee4f3c82e36030bf9ee450bf3f311"
     else
       url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.2.0/oboi-dlp-darwin-amd64.tar.gz"
-      sha256 "c3aaab53270aab03ee35f54f96f38ecfef437d7994192e274d02c58436113f01"
+      sha256 "63d3453625b424a2b1ca20b46c859d351122ad6a58c6c429237c4a201a5f9def"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
       url "https://github.com/forshaws/homebrew-oboi-dlp/releases/download/v0.2.0/oboi-dlp-linux-amd64.tar.gz"
-      sha256 "adc47f76430ebaf01cdcb70d77b6511092345b394314fbb8ddc3da413241233c"
+      sha256 "ce44a75308bbc026b180ad1afb5aefd422cddd346ea2cad269fef1c8fd9480e6"
     else
       odie "No Linux ARM build available"
     end
