@@ -1,6 +1,0 @@
-a1@ex.com
-a2@ex.com
-a3@ex.com
-a4@ex.com
-a5@ex.com
-a6@ex.com
