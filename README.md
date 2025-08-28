@@ -289,20 +289,24 @@ brew services {start|stop|restart} httpd
 
 ## 🔐 Licensing
 
-### Free Trial
-oboi-dlp includes a free trial mode for:
-- Personal use
-- Educational purposes  
-- Prototyping
 
-### Licensed Features
-Commercial use requires a valid API key. Set your license key in Apache configuration:
+**oboi-dlp** is a commerical software product and requires a valid API key to function. Visit [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/) to obtain a commerical license API key.
+
+
+Set your license key in Apache configuration:
 
 ```apache
 SetEnv OBOI_DLP_APIKEY="YOUR_API_KEY_GOES_HERE"
 ```
+Once you have netered your API Key you should restart apache.
 
-Visit [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/) for licensing details.
+## 🦉 Community and Trial Modes
+
+
+**oboi-dlp** has a free trial mode for new user inbuilt. Simply install it using the instructions above and the software will register itself and allow you to use the full features of the Dev/Enterprise Pro version to evaluate it.
+
+After the trial ends **oboi-dlp** will revert to **community edition** - a cut down version that is not licesed for use on production systems. You can use community edition for free or upgrade at anytime to a commercial license and restore the paid for features.
+
 
 ---
 
@@ -345,4 +349,5 @@ Remove configuration from `httpd.conf` and restart Apache.
 
 ---
 
-**Version 0.1.9** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)
+**Version 0.2.0** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)
+
