@@ -178,12 +178,14 @@ AWS Temp Key = on,0
 Credit Card = on,0
 National ID = on,0
 Sort Code = on,10
-UK Bank Account = on,5
-US Bank Account = on,5
-Phone Number = on,10
-Phone Number USA = on,10
+UK Bank Account = off,5
+US Bank Account = off,5
+Phone Number=off,10
+Phone Number USA=off,10
+MySQL Error = on,0
+SQL Statement Echo = on,0
 Email Threshold = 5
-Whitelist URIs = /status,/healthcheck,/whitelist.txt
+Whitelist URIs = on,/status,/healthcheck,/oboi-dlp-test/whitelist.txt
 ```
 
 Format: `<RULE_NAME> = <on/off>, <threshold>`
@@ -344,10 +346,9 @@ Remove configuration from `httpd.conf` and restart Apache.
 - **Configurable Rules** - Customizable detection thresholds
 - **Multi-platform** - Works on macOS and Linux
 - **Enterprise Integration** - IMS/QMS audit exports
-- **Fraud Detection** - Optional email/username scoring via TORIDION API
 - **Instant Alerts** - ntfy.sh notifications for critical events
 
 ---
 
-**Version 0.2.0** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)
+**Version 0.2.1** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)
 

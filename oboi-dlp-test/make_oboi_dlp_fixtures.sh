@@ -378,5 +378,48 @@ cat > "$ROOT/safe.txt" <<'EOF'
 This is a safe file with no sensitive data.
 EOF
 
+# --- mysql.txt (should BLOCK) ---
+cat > "$ROOT/mysql.txt" <<'EOF'
+# mysql.txt
+# This file contains examples of MySQL error messages and warnings that should be blocked.
+
+You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM users' at line 1
+
+SQLSTATE[HY000]: General error: 1364 Field 'email' doesn't have a default value
+
+Warning: mysql_fetch_array() expects parameter 1 to be resource, boolean given in /var/www/index.php on line 42
+
+MySQL server has gone away
+
+# Safe text below should NOT trigger detection
+This is a general sentence talking about databases without showing real errors.
+
+EOF
+
+# --- sql.txt (should BLOCK) ---
+cat > "$ROOT/sql.txt" <<'EOF'
+# sql.txt
+# This file contains examples of raw SQL statements that developers might accidentally echo in responses.
+
+SELECT id, username, password FROM users WHERE id = 1;
+
+INSERT INTO accounts (id, email, password) VALUES (1, 'test@example.com', 'secret');
+
+UPDATE users SET password = 'newpass' WHERE id = 42;
+
+DELETE FROM sessions WHERE user_id = 5;
+
+DROP TABLE customers;
+
+CREATE TABLE logs (id INT, message TEXT);
+
+# Safe text below should NOT trigger detection
+This article explains how to use SELECT in SQL (no actual query).
+
+EOF
+
+
+
+
 echo "✅ Test fixtures written to: $ROOT"
 

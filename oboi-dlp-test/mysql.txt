@@ -1,0 +1,13 @@
+# mysql.txt
+# This file contains examples of MySQL error messages and warnings that should be blocked.
+
+You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM users' at line 1
+
+SQLSTATE[HY000]: General error: 1364 Field 'email' doesn't have a default value
+
+Warning: mysql_fetch_array() expects parameter 1 to be resource, boolean given in /var/www/index.php on line 42
+
+MySQL server has gone away
+
+# Safe text below should NOT trigger detection
+This is a general sentence talking about databases without showing real errors.
