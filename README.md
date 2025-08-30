@@ -188,7 +188,20 @@ Email Threshold = 5
 Whitelist URIs = on,/status,/healthcheck,/oboi-dlp-test/whitelist.txt
 ```
 
+
 Format: `<RULE_NAME> = <on/off>, <threshold>`
+
+
+## New in 0.2.2 - custom filters
+From v0.2.2 the user can now set custom rulesin the oboi-dlp.conf (use sparingly they have an overhead).
+```ini
+Custom Regex InternalTicket = \bTICKET-[0-9]{6}\b
+InternalTicket = on,0
+```
+
+Format: `Custom Regex <RULE_NAME> = <expression>`
+
+Custom rules can be kept in config and turned on off using their RULE_NAME like so this `<RULE_NAME> = on,<threshold>`
 
 ---
 
@@ -351,4 +364,3 @@ Remove configuration from `httpd.conf` and restart Apache.
 ---
 
 **Version 0.2.2** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)
-
