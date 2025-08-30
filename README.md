@@ -350,5 +350,5 @@ Remove configuration from `httpd.conf` and restart Apache.
 
 ---
 
-**Version 0.2.1** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)
+**Version 0.2.2** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)
 

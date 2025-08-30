@@ -420,6 +420,18 @@ EOF
 
 
 
+# --- custom.txt (may BLOCK) ---
+cat > "$ROOT/custom.txt" <<'EOF'
+# custom.txt
+This is a normal line with no issues.
+User submitted code: SECRET-1234 should be flagged.
+Another line with SECRET-567228 hidden in plain sight.
+This one should NOT match: SECRET-ABCD
+And neither should this: SECRET-123 (too short)
+
+EOF
+
+
 
 echo "✅ Test fixtures written to: $ROOT"
 

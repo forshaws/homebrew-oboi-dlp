@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>OBOI-DLP Filter Playground V0.2.1</title>
+<title>OBOI-DLP Filter Playground V0.2.2</title>
 <style>
   :root { --bg:#0b0f14; --fg:#d6dde6; --muted:#8aa1b1; --ok:#36d399; --bad:#ff6b6b; --card:#111722; }
   * { box-sizing: border-box; }
@@ -37,7 +37,7 @@
 </style>
 </head>
 <body>
-  <h1>OBOI-DLP Filter Playground V0.2.1</h1>
+  <h1>OBOI-DLP Filter Playground V0.2.2</h1>
   <p>Loads a set of files through Apache. If OBOI-DLP blocks them, you’ll see ❌ BLOCKED. Otherwise ✅ PASS.</p>
   <div class="card">
     <button class="run" id="runBtn">▶ Run Tests</button>
@@ -60,6 +60,7 @@ const tests = [
   { file: 'bank_accounts.txt',       expect: 'block',  label: 'Account-like numbers (may BLOCK ❌)' },
   { file: 'sort_codes.txt',          expect: 'mixed',  label: 'Sort codes + dates (dates PASS, sort codes BLOCK ❌)' },
   { file: 'phone_numbers.txt',       expect: 'block',  label: 'UK phone numbers (may BLOCK ❌)' },
+  { file: 'custom.txt',       		 expect: 'block',  label: 'User defined (may BLOCK ❌)' },
   { file: 'mysql.txt',       		 expect: 'block',  label: 'MYSQL errors (should BLOCK ❌)' },
   { file: 'sql.txt',       			 expect: 'block',  label: 'SQL Commands (should BLOCK ❌)' },
 ];
