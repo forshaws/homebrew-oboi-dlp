@@ -193,7 +193,7 @@ Format: `<RULE_NAME> = <on/off>, <threshold>`
 
 
 ## New in 0.2.2 - custom filters
-From v0.2.2 the user can now set custom rulesin the oboi-dlp.conf (use sparingly they have an overhead).
+From v0.2.2 the user can now set custom rules in the oboi-dlp.conf (use sparingly they have an overhead).
 ```ini
 Custom Regex InternalTicket = \bTICKET-[0-9]{6}\b
 InternalTicket = on,0
