@@ -49,7 +49,7 @@ Instead, here are the best ways to contribute:
 ## 🔐 Reporting Security Issues
 
 If you discover a security vulnerability, please **do not open a public issue**.  
-Instead, email us at **security@toridion.como** (or use the contact form on our website).  
+Instead, email us at **security@toridion.com** (or use the contact form on our website).  
 We take security reports seriously and will respond quickly.
 
 ---
