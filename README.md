@@ -2,7 +2,7 @@
 
 ![oboi logo](oboi_logo_colour_obee.png)
 
-**oboi-dlp** is an Apache external filter for Data Leak Prevention (DLP) that inspects HTTP request and response bodies in real time, applying configurable rules for blocking, logging, or alerting on sensitive data.
+**oboi-dlp** is an Apache (and NGINX) external filter for Data Leak Prevention (DLP) that inspects HTTP request and response bodies in real time, applying configurable rules for blocking, logging, or alerting on sensitive data.
 
 ## 🚀 Quick Install
 
@@ -153,6 +153,82 @@ ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/obo
 - **systemd PrivateTmp:** Check if Apache has private temp namespace that could affect file operations. See the **PrivateTmp & oboi-dlp** section for detailed information.
 
 ---
+### NGINX Configuration
+
+OBOI-DLP works seamlessly with NGINX, but its setup is slightly different from Apache.  
+Because NGINX does not use `mod_ext_filter`, you will need to configure a **proxy wrapper** (located in the repository folder /ngix that forwards traffic to OBOI-DLP for inspection. Follow these general steps:
+
+These instructions assume you have a running NGINX instance and are familliar at least with how it operates and where your configurations live. There are so many persobalised configurations of NGINX that we leave the details to you on how you want oboi-dlp to handle filtering. This example therfore is a minimum viable install and will filter everything being served from root / web folder. You can alter the location, handle virtual hosts and https if you wish.
+
+**Step 1:** Update Your NGINX Configuration
+
+Edit your main NGINX config (usually /etc/nginx/nginx.conf or /etc/nginx/sites-enabled/*)
+Add the following location block:
+
+```bash
+location / {
+    proxy_pass http://127.0.0.1:8081;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_buffering off;
+}
+```
+The above location block will tell NGINX to proxy pass every request in / or hoigher of your web root via oboi-dlp. The oboi-dlp wrapper listening on port 8081 will call oboi-dlp and handle the return or blocking.
+
+### Step 2: Install the OBOI-DLP wrapper
+```bash
+sudo mkdir -p /opt/oboi-dlp-wrapper/
+sudo cp oboi-wrapper.py /opt/oboi-dlp-wrapper/
+```
+### Step 3: Configure environment and run the wrapper manually
+
+NGINX handles environment variables slightly differently than Apache. The noraml ``Setenv`` directive is not used. To set the environment variables that oboi-dlp expects to see, the easist way is inside the provided proxy wrapper. 
+
+Open the wrapper with your editor: 
+```bash
+sudo nano /opt/oboi-dlp-wrapper/oboi-wrapper.py
+```
+on line 6 and 7 you will see two placeholder keys. Uncomment the key and replace the placeholder with your APIKEY or NTFY TOPIC as per the Apache instructions. 
+
+```ini
+#env["OBOI_DLP_APIKEY"] = "YOUR_API_KEY_GOES_HERE" 
+#env["OBOI_DLP_TOPIC"] = "your_topic_name_here"
+```
+
+Once you have set the env variable (optional - see Apache instructions related to all env vars used) you can run the wrapper.
+
+```bash
+python3 /opt/oboi-dlp-wrapper/oboi-wrapper.py
+```
+
+At this point the oboi-wrapper will begin listening on port 8081 - the port that NGINX will use to talk to oboi-dlp. It is worth remonding the user tat the oboi-wrapper.py can be modified to alter the default behaviours and handle custom error pages.
+
+
+
+**Note**
+- Update the OBOI-DLP binary path in oboi-wrapper.py based on your architecture (common vlaues are):
+- Intel (x86_64): /usr/local/bin/oboi-dlp
+- Apple Silicon (arm64): /opt/homebrew/bin/oboi-dlp
+- Linux (Debian): /home/linuxbrew/.linuxbrew/bin/oboi-dlp
+
+### Step 4: Restart NGINX to apply changes
+```bash
+sudo systemctl restart nginx
+```
+or
+
+```bash
+sudo service nginx restart
+```
+
+### Troubleshooting NGIX
+
+- Wrapper not responding: Ensure oboi-wrapper.py is running and listening on port 8081
+- Permission issues: Make sure wrapper and OBOI-DLP binary are executable and readable by the NGINX user (www-data)
+- Port conflicts: If port 8081 is in use, change both the wrapper's port and the NGINX proxy_pass
+
+--- 
 
 ## 📁 Working Directory
 
