@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from flask import Flask, request, Response, send_file
-import os, subprocess, datetime, mimetypes, urllib.parse
+import os, subprocess, datetime, mimetypes, urllib.parse, html
 
 env = os.environ.copy()
 #env["OBOI_DLP_APIKEY"] = "YOUR_API_KEY_GOES_HERE"
@@ -41,16 +41,16 @@ def serve_and_filter(path):
             # No index file → generate HTML directory listing
             try:
                 files = sorted(os.listdir(full_path))
-                listing_html = f"<html><head><title>Index of /{path}</title></head><body>"
-                listing_html += f"<h1>Index of /{path}</h1><ul>"
+                listing_html = f"<html><head><title>Index of /{html.escape(path)}</title></head><body>"
+                listing_html += f"<h1>Index of /{html.escape(path)}</h1><ul>"
                 # Parent directory link if not root
                 if path:
                     parent = os.path.dirname(path.rstrip("/"))
-                    listing_html += f'<li><a href="/{parent}">..</a></li>'
+                    listing_html += f'<li><a href="/{html.escape(parent)}">..</a></li>'
                 for f in files:
                     f_path = os.path.join(path, f)
                     f_url = urllib.parse.quote(f_path)
-                    listing_html += f'<li><a href="/{f_url}">{f}</a></li>'
+                    listing_html += f'<li><a href="/{f_url}">{html.escape(f)}</a></li>'
                 listing_html += "</ul></body></html>"
                 return Response(listing_html, status=200, mimetype="text/html")
             except Exception as e:
