@@ -156,7 +156,7 @@ ExtFilterDefine dlpfilterout mode=output cmd="/home/linuxbrew/.linuxbrew/bin/obo
 ### NGINX Configuration
 
 OBOI-DLP works seamlessly with NGINX, but its setup is slightly different from Apache.  
-Because NGINX does not use `mod_ext_filter`, you will need to configure a **proxy wrapper** (located in the repository folder /ngix that forwards traffic to OBOI-DLP for inspection. Follow these general steps:
+Because NGINX does not use `mod_ext_filter`, you will need to configure a **proxy wrapper** (located in the repository folder /nginx that forwards traffic to OBOI-DLP for inspection. Follow these general steps:
 
 These instructions assume you have a running NGINX instance and are familliar at least with how it operates and where your configurations live. There are so many persobalised configurations of NGINX that we leave the details to you on how you want oboi-dlp to handle filtering. This example therfore is a minimum viable install and will filter everything being served from root / web folder. You can alter the location, handle virtual hosts and https if you wish.
 
@@ -222,7 +222,7 @@ or
 sudo service nginx restart
 ```
 
-### Troubleshooting NGIX
+### Troubleshooting NGINX
 
 - Wrapper not responding: Ensure oboi-wrapper.py is running and listening on port 8081
 - Permission issues: Make sure wrapper and OBOI-DLP binary are executable and readable by the NGINX user (www-data)
