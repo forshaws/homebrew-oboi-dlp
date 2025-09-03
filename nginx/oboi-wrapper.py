@@ -50,7 +50,7 @@ def serve_and_filter(path):
                 for f in files:
                     f_path = os.path.join(path, f)
                     f_url = urllib.parse.quote(f_path)
-                    listing_html += f'<li><a href="/{f_url}">{html.escape(f)}</a></li>'
+                    listing_html += f'<li><a href="/{html.escape(f_url)}">{html.escape(f)}</a></li>'
                 listing_html += "</ul></body></html>"
                 return Response(listing_html, status=200, mimetype="text/html")
             except Exception as e:
