@@ -86,7 +86,7 @@ def serve_and_filter(path):
 
         except Exception as e:
             print(f"[ERROR] Failed processing {full_path}: {e}")
-            return Response(f"Error reading file: {e}\n", status=500, mimetype="text/plain")
+            return Response("Error reading file\n", status=500, mimetype="text/plain")
 
     # File does not exist
     print(f"[WARN] File not found: {full_path}")
