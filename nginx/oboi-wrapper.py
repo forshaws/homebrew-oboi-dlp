@@ -19,7 +19,15 @@ def serve_and_filter(path):
     client = request.remote_addr or "-"
     print(f"[{now}] {client} {request.method} {request.path}")
 
+	# -----------------------------------------------------------------
+    # BAsic directory traversal protection
     full_path = os.path.join(BASE_PATH, path)
+    full_path = os.path.realpath(full_path)  # normalize to absolute path
+    base_realpath = os.path.realpath(BASE_PATH)
+    if not full_path.startswith(base_realpath):
+        print(f"[WARN] Directory traversal attempt blocked: {path}")
+        return Response("Forbidden\n", status=403, mimetype="text/plain")
+    # -----------------------------------------------------------------
 
     # Handle directories
     if os.path.isdir(full_path):
