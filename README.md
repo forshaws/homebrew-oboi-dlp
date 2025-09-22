@@ -265,7 +265,25 @@ Whitelist URIs = on,/status,/healthcheck,/oboi-dlp-test/whitelist.txt
 ```
 
 
-Format: `<RULE_NAME> = <on/off>, <threshold>`
+Format: `<RULE_NAME> = <on/off/R>, <threshold>`
+
+
+## New in 0.2.3 - 'R' switch in filters
+From v0.2.3 the user can now use a new filter switch 'R'. The 'R' signals to oboi-dlp to apply blocking hierarchy of BLOCK/RESTRICT/PASS. If the rule triggers AND no other rule causes a BLOCK, then oboi-dlp will return 
+
+``Access Restricted <data>,<data>,...`` where the <data> fields are 1 or more (limit 200 chars) abolute values that are returned to the calling process for further checking. This feature supports streaming LLM functionality and TQNN SIE protocols when used with NGINX wrappers.
+
+
+```ini
+Custom Regex InternalTicket = \bTICKET-[0-9]{6}\b
+InternalTicket = R,0
+```
+
+Format: `Custom Regex <RULE_NAME> = <expression>`
+
+Custom rules can be kept in config and turned on off using their RULE_NAME like so this `<RULE_NAME> = on,<threshold>`
+
+
 
 
 ## New in 0.2.2 - custom filters
@@ -278,6 +296,9 @@ InternalTicket = on,0
 Format: `Custom Regex <RULE_NAME> = <expression>`
 
 Custom rules can be kept in config and turned on off using their RULE_NAME like so this `<RULE_NAME> = on,<threshold>`
+
+
+
 
 ---
 
@@ -436,7 +457,7 @@ Remove configuration from `httpd.conf` and restart Apache.
 - **Multi-platform** - Works on macOS and Linux
 - **Enterprise Integration** - IMS/QMS audit exports
 - **Instant Alerts** - ntfy.sh notifications for critical events
-
+- **Conditional Restrictions** - flag sensitive content for redaction post filtering
 ---
 
-**Version 0.2.2** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)
+**Version 0.2.3** | For support and documentation: [toridion.com/oboi-dlp](https://toridion.com/oboi-dlp/)

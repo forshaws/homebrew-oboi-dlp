@@ -9,6 +9,9 @@ build/
 # Binary builds folder
 releases/
 
+# Python folder
+python/
+
 # Arduino backups
 *.bak
 *.tmp

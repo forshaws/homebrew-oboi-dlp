@@ -13,7 +13,7 @@ cat <<'EOF'
  ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝   ╚═════╝ ╚══════╝╚═╝ 
 
                  O  B  O  I   -   D  L  P
-           Pen Test Suite v0.2.2  © 2025 Scot Forshaw
+           Pen Test Suite v0.2.3  © 2025 Scot Forshaw
 ---------------------------------------------------------------------
 EOF
 
@@ -37,6 +37,7 @@ tests=(
   "sort_codes.txt|mixed|Sort codes + dates (may BLOCK ❌)|Dates pass; genuine sort codes block"
   "phone_numbers.txt|block|Phone numbers (may BLOCK ❌)|UK E.164 + local mobile patterns"
   "custom.txt|block|User defined (may BLOCK ❌)|User defined patterns"
+  "order_numbers.txt|block|User defined (may BLOCK or RESTRICT ❌)|User defined patterns"
   "mysql.txt|block|MYSQL errors (should BLOCK ❌)|Common MYSQL patterns"
   "sql.txt|block|SQL Commands (should BLOCK ❌)|Common SQL patterns"
 )
